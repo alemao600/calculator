@@ -46,14 +46,14 @@ android.permissions = INTERNET
 # (bool) Accept Android SDK licenses automatically (recomendado para CI)
 android.accept_sdk_license = True
 
-# (str) Application entry point is main.py por padrão
-# entrypoint = main.py
+# (bool) Skip first time setup
+android.skip_first_time_setup = True
 
-# (str) Icon of the application (opcional)
-# icon.filename = %(source.dir)s/data/icon.png
+# (str) Android NDK version to use
+android.ndk = 25b
 
-# (str) Presplash of the application (opcional)
-# presplash.filename = %(source.dir)s/data/presplash.png
+# (str) Android SDK version to use
+android.sdk = 33
 
 [buildozer]
 # (str) Command to run the application
