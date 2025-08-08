@@ -18,7 +18,6 @@ MDScreen:
         MDTextField:
             id: entrada_reais
             hint_text: "Valor em R$"
-            input_filter: "float"
             helper_text: "Use vírgula ou ponto"
             helper_text_mode: "on_focus"
 
@@ -37,19 +36,19 @@ MDScreen:
 
             MDRaisedButton:
                 text: "Converter"
-                md_bg_color: app.theme_cls.success_color
+                md_bg_color: app.theme_cls.primary_color
                 on_release: app.converter()
 
             MDRaisedButton:
-                text: "Mostrar/Ocultar Histórico"
+                text: "Histórico"
                 on_release: app.toggle_historico()
 
             MDRaisedButton:
-                text: "Mostrar/Ocultar Conversão"
+                text: "Taxa"
                 on_release: app.toggle_conversao()
 
             MDFlatButton:
-                text: "Alternar Tema"
+                text: "Tema"
                 on_release: app.alternar_tema()
 
         # Caixa da taxa (inicia oculta)
@@ -70,7 +69,6 @@ MDScreen:
             MDTextField:
                 id: entrada_taxa
                 text: "1950"
-                input_filter: "float"
 
         # Caixa do histórico (inicia oculta)
         MDBoxLayout:
@@ -103,20 +101,25 @@ class ConversorApp(MDApp):
         return Builder.load_string(KV)
 
     def formatar_resultado(self, valor: float) -> str:
-        inteiro = int(valor)
-        decimal = round((valor - inteiro) * 100)
-        extenso_inteiro = num2words(inteiro, lang='pt_BR')
-        if decimal > 0:
-            extenso_decimal = num2words(decimal, lang='pt_BR')
-            extenso_completo = f"{extenso_inteiro} e {extenso_decimal}"
-        else:
-            extenso_completo = extenso_inteiro
-        valor_formatado = f"{valor:,.2f}".replace(",", ".")
-        return f"{valor_formatado} moedas ({extenso_completo})"
+        try:
+            inteiro = int(valor)
+            decimal = round((valor - inteiro) * 100)
+            extenso_inteiro = num2words(inteiro, lang='pt_BR')
+            if decimal > 0:
+                extenso_decimal = num2words(decimal, lang='pt_BR')
+                extenso_completo = f"{extenso_inteiro} e {extenso_decimal}"
+            else:
+                extenso_completo = extenso_inteiro
+            valor_formatado = f"{valor:,.2f}".replace(",", ".")
+            return f"{valor_formatado} moedas ({extenso_completo})"
+        except:
+            return f"{valor:,.2f} moedas"
 
     def converter(self):
         try:
             reais_str = self.root.ids.entrada_reais.text.strip().replace(",", ".")
+            if not reais_str:
+                return
             reais = float(reais_str)
             taxa = float(self.root.ids.entrada_taxa.text.strip().replace(",", "."))
             resultado = reais * taxa
@@ -126,26 +129,32 @@ class ConversorApp(MDApp):
             self.historico.append(f"R$ {reais:.2f} → {texto_resultado}")
             self.atualizar_historico()
         except ValueError:
-            from kivymd.toast import toast
-            toast("Digite um número válido.")
+            self.root.ids.resultado_label.text = "Digite um número válido"
+        except Exception as e:
+            self.root.ids.resultado_label.text = "Erro na conversão"
 
     def atualizar_historico(self):
-        from kivymd.uix.list import OneLineListItem
-        lista = self.root.ids.historico_list
-        lista.clear_widgets()
-        for item in self.historico[-10:]:
-            lista.add_widget(OneLineListItem(text=item))
+        try:
+            from kivymd.uix.list import OneLineListItem
+            lista = self.root.ids.historico_list
+            lista.clear_widgets()
+            for item in self.historico[-10:]:
+                lista.add_widget(OneLineListItem(text=item))
+        except:
+            pass
 
     def _toggle_box(self, box):
-        # Mostra/oculta usando altura e opacidade
-        if box.height == 0:
-            box.disabled = False
-            box.opacity = 1
-            box.height = box.minimum_height
-        else:
-            box.disabled = True
-            box.opacity = 0
-            box.height = 0
+        try:
+            if box.height == 0:
+                box.disabled = False
+                box.opacity = 1
+                box.height = box.minimum_height
+            else:
+                box.disabled = True
+                box.opacity = 0
+                box.height = 0
+        except:
+            pass
 
     def toggle_historico(self):
         self._toggle_box(self.root.ids.historico_box)
@@ -154,9 +163,12 @@ class ConversorApp(MDApp):
         self._toggle_box(self.root.ids.taxa_box)
 
     def alternar_tema(self):
-        self.theme_cls.theme_style = (
-            "Light" if self.theme_cls.theme_style == "Dark" else "Dark"
-        )
+        try:
+            self.theme_cls.theme_style = (
+                "Light" if self.theme_cls.theme_style == "Dark" else "Dark"
+            )
+        except:
+            pass
 
 
 if __name__ == "__main__":

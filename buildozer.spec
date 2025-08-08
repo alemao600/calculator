@@ -19,8 +19,8 @@ source.include_exts = py,kv
 version = 0.1.0
 
 # (list) Application requirements
-# Kivy 2.2.x é estável no Android; KivyMD 1.1.1 é compatível
-requirements = python3,kivy==2.2.1,kivymd==1.1.1,num2words
+# Versões mais estáveis para Android
+requirements = python3,kivy==2.1.0,kivymd==0.104.2,num2words
 
 # (str) Supported orientation (one of: landscape, sensorLandscape, portrait or all)
 orientation = portrait
